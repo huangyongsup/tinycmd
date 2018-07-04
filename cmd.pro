@@ -1,6 +1,8 @@
 HEADERS += \
-    tinycmd.h
+    tinycmd.h \
+    mystring.h
 
 SOURCES += \
     tinycmd.cpp \
-    main.cpp
+    main.cpp \
+    mystring.cpp

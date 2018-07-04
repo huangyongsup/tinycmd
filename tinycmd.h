@@ -7,8 +7,8 @@ class TinyCMD
 {
 public:
     TinyCMD();
-    ~TinyCMD();
-    bool currentWorkDirectory();
+    ~TinyCMD();    
+    char cwd[PATH_SIZE];
     void _cd_(int argc, char *argv[]);
     void _copy_(int argc, char *argv[]);
     void _chdir_(int argc, char *argv[]);
@@ -32,9 +32,11 @@ public:
     void _ping_(int argc, char *argv[]);
     void _ren_(int argc, char *argv[]);
     void _tracert_(int argc, char *argv[]);
-private:
+    void _vim_(int argc, char *argv[]);
+private:    
+    char homeDirectory[PATH_SIZE];
     void execute(char *argv[]);
-    char** replace(char *argv[]);
+    char *stringCopy(char *dst, const char *src);
 };
 
 #endif // TINYCMDH

@@ -1,12 +1,11 @@
 #include"tinycmd.h"
 #include<sys/wait.h>
 #include<sys/types.h>
-#include<string.h>
-#include<iostream>
-#include<errno.h>
 #include<unistd.h>
 #include<stdlib.h>
-using namespace std;
+#include"mystring.h"
+
+MyString mystr;
 
 TinyCMD::TinyCMD()
 {
@@ -17,43 +16,13 @@ TinyCMD::~TinyCMD()
 
 }
 
-bool TinyCMD::currentWorkDirectory()
-{
-    char cwd[PATH_SIZE];
-    if(getcwd(cwd, sizeof(cwd)))
-    {
-        cout << cwd << "# ";
-    }
-    return true;
-}
-
-char** TinyCMD::replace(char *argv[])
-  {
-    for(int column = 0; argv[1][column] != '\0'; ++column)
-    {
-         if(argv[1][column] == '\\')
-        {
-            argv[1][column] = '/';
-        }
-    }
-     if(argv[1][1] == ':')
-     {
-         for(int column = 2; argv[1][2] == '/'; ++column)
-         {
-            argv[1][column] = argv[1][column + 1];
-         }
-     }
-     return argv;
-}
-
 void TinyCMD::execute(char *argv[])
 {
-    pid_t pid;
-    if(pid = fork() == 0)
+    pid_t pid = fork();
+    if(pid == 0)
     {
         if(execvp(argv[0], argv) < 0)
         {
-            cout << "failed error code:" << errno << endl;
             exit(1);
         }
     }
@@ -66,9 +35,15 @@ void TinyCMD::execute(char *argv[])
 
 void TinyCMD::_cd_(int argc, char *argv[])
 {
-    if(argc == 2)
+    if(argc == 1)
     {
-        execute(argv);
+        mystr.stringCopy(TinyCMD::cwd, "~");
+        chdir(TinyCMD::cwd);
+    }
+    else if(argc == 2)
+    {
+        mystr.stringCopy(TinyCMD::cwd, argv[1]);
+        chdir(TinyCMD::cwd);
     }
 
 }
@@ -76,10 +51,7 @@ void TinyCMD::_cd_(int argc, char *argv[])
 void TinyCMD::_copy_(int argc, char *argv[])
 {
     argv[0] = "cp";
-    if(argc == 3)
-    {
-        execute(argv);
-    }
+    execute(argv);
 }
 
 void TinyCMD::_chdir_(int argc, char *argv[])
@@ -98,10 +70,6 @@ void TinyCMD::_cls_(int argc, char *argv[])
     {
         execute(argv);
     }
-    else
-    {
-        cout << "Too many parameters!";
-    }
 }
 //Show date
 void TinyCMD::_date_(int argc, char *argv[])
@@ -110,16 +78,12 @@ void TinyCMD::_date_(int argc, char *argv[])
     {
         execute(argv);
     }
-    else
-    {
-        cout << "Too many parameters! ";
-    }
 }
 
 void TinyCMD::_del_(int argc, char *argv[])
 {
     argv[0] = "rm";
-    //if(argc == 2)
+    if(argc == 2)
     {
         execute(argv);
     }
@@ -134,19 +98,11 @@ void TinyCMD::_dir_(int argc, char *argv[])
     }
     if(argc == 2)
     {
-        if(!strcmp(argv[1],"/a"))
+        if(!mystr.stringCompara(argv[1],"/a"))
         {
             argv[1] = "-a";
             execute(argv);
         }
-        else
-        {
-            cout << "Incorrent parameters! " << endl;
-        }
-    }
-    if(argc > 2)
-    {
-        cout << "Too many parameters! ";
     }
 }
 
@@ -173,10 +129,6 @@ void TinyCMD::_exit_(int argc, char *argv[])
     {
         exit(0);
     }
-    else
-    {
-        cout<<"Too many parameters! ";
-    }
 }
 //List the differences between two file's content
 void TinyCMD::_fc_(int argc, char *argv[])
@@ -200,10 +152,7 @@ void TinyCMD::_find_(int argc, char *argv[])
 void TinyCMD::_ipconfig_(int argc, char *argv[])
 {
     argv[0] = "ifconfig";
-    if(argc == 1)
-    {
         execute(argv);
-    }
 }
 
 void TinyCMD::_net_re_start_stop_(int argc, char *argv[])
@@ -272,4 +221,9 @@ void TinyCMD::_tracert_(int argc, char *argv[])
 {
     argv[0] = "traceroute";
     execute(argv);
+}
+
+void TinyCMD::_vim_(int argc, char *argv[])
+{
+        execute(argv);
 }
